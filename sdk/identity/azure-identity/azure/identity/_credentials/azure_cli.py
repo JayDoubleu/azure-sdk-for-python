@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
 
 CLI_NOT_FOUND = "Azure CLI not found on path"
-COMMAND_LINE = "az account get-access-token --output json --resource {}"
+COMMAND_LINE = "az account get-access-token --output json --resource {} --tenant {}"
 NOT_LOGGED_IN = "Please run 'az login' to set up an account"
 
 
@@ -53,7 +53,11 @@ class AzureCliCredential(object):
         """
 
         resource = _scopes_to_resource(*scopes)
-        output, error = _run_command(COMMAND_LINE.format(resource))
+        if tenant:
+            COMMAND_LINE = COMMAND_LINE + " --tenant {}"
+            output, error = _run_command(COMMAND_LINE.format(resource, tenant))
+        else:
+            output, error = _run_command(COMMAND_LINE.format(resource))
         if error:
             raise error
 
